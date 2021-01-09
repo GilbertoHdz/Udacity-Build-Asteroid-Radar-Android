@@ -1,8 +1,9 @@
-package com.gilbertohdz.asteroidradar
+package com.gilbertohdz.asteroidradar.ui
 
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.gilbertohdz.asteroidradar.R
 
 @BindingAdapter("statusIcon")
 fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {

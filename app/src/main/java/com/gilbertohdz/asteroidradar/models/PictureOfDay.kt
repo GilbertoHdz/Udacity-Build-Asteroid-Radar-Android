@@ -1,4 +1,4 @@
-package com.gilbertohdz.asteroidradar
+package com.gilbertohdz.asteroidradar.models
 
 import com.squareup.moshi.Json
 

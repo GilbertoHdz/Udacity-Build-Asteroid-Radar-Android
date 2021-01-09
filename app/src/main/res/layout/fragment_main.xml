@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.gilbertohdz.asteroidradar.main.MainViewModel" />
+            type="com.gilbertohdz.asteroidradar.ui.main.MainViewModel" />
 
     </data>
 

@@ -1,6 +1,6 @@
 package com.gilbertohdz.asteroidradar.api
 
-import com.gilbertohdz.asteroidradar.Asteroid
+import com.gilbertohdz.asteroidradar.models.Asteroid
 import com.gilbertohdz.asteroidradar.Constants
 import org.json.JSONObject
 import java.text.SimpleDateFormat
