@@ -63,3 +63,14 @@ private fun getNextSevenDaysFormattedDates(): ArrayList<String> {
 
     return formattedDateList
 }
+
+fun getFirstAndEndDate(): Pair<String, String> {
+    val dateFormat = SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
+    val calendar = Calendar.getInstance()
+    val start = calendar.time
+    calendar.add(Calendar.DAY_OF_YEAR, 7)
+    val endTime = calendar.time
+
+
+    return Pair(dateFormat.format(start), dateFormat.format(endTime))
+}
