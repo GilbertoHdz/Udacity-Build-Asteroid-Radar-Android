@@ -1,9 +1,49 @@
 package com.gilbertohdz.asteroidradar.ui
 
+import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.gilbertohdz.asteroidradar.R
+import com.gilbertohdz.asteroidradar.models.Asteroid
+import com.gilbertohdz.asteroidradar.models.PictureOfDay
+import com.gilbertohdz.asteroidradar.ui.main.AsteroidApiStatus
+import com.gilbertohdz.asteroidradar.ui.main.MainAdapter
+import com.google.android.material.snackbar.Snackbar
+import com.squareup.picasso.Picasso
+
+@BindingAdapter("asteroidItems")
+fun bindAsteroidItems(recyclerView: RecyclerView, items: List<Asteroid>?) {
+    items?.let {
+        with(recyclerView.adapter as MainAdapter) {
+            updateItems(it)
+        }
+    }
+}
+
+@BindingAdapter("progress")
+fun bindProgress(progressBar: ProgressBar, status: AsteroidApiStatus?) {
+    status?.let {
+        progressBar.visibility = if (status == AsteroidApiStatus.LOADING) View.VISIBLE else View.GONE
+    }
+}
+
+@BindingAdapter("statusMessage")
+fun bindProgress(constraintLayout: ConstraintLayout, status: AsteroidApiStatus) {
+    if (status == AsteroidApiStatus.ERROR) {
+        Snackbar.make (constraintLayout, "an error has been occurred, try again.", Snackbar.LENGTH_SHORT)
+    }
+}
+
+@BindingAdapter("imageOfTheDay")
+fun bindImageOfTheDay(imageView: ImageView, pictureOfDay: PictureOfDay?) {
+    pictureOfDay?.let {
+        Picasso.get().load(pictureOfDay.url).into(imageView);
+    }
+}
 
 @BindingAdapter("statusIcon")
 fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {

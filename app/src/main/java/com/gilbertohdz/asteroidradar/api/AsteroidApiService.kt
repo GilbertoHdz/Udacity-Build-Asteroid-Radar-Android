@@ -1,6 +1,8 @@
 package com.gilbertohdz.asteroidradar.api
 
 import com.gilbertohdz.asteroidradar.Constants.BASE_URL
+import com.gilbertohdz.asteroidradar.Constants.NASA_API_KEY
+import com.gilbertohdz.asteroidradar.models.PictureOfDay
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.ResponseBody
@@ -21,12 +23,14 @@ private val retrofit = Retrofit.Builder()
 
 interface AsteroidApiService {
 
-    @GET("neo/rest/v1/feed")
+    @GET("neo/rest/v1/feed?api_key=${NASA_API_KEY}")
     suspend fun getAsteroids(
         @Query("start_date") startDate: String,
-        @Query("end_date") endDate: String,
-        @Query("api_key") apiKey: String
+        @Query("end_date") endDate: String
     ): Response<ResponseBody>
+
+    @GET("planetary/apod?api_key=${NASA_API_KEY}")
+    suspend fun getPlanetaryApod(): Response<PictureOfDay>
 }
 
 object AsteroidApi {
