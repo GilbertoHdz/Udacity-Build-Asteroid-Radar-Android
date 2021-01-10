@@ -3,7 +3,9 @@ package com.gilbertohdz.asteroidradar.ui.main
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.gilbertohdz.asteroidradar.R
 import com.gilbertohdz.asteroidradar.databinding.FragmentMainBinding
 
@@ -27,6 +29,13 @@ class MainFragment : Fragment() {
         setHasOptionsMenu(true)
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.navigateToDetail.observe(viewLifecycleOwner, Observer { item ->
+            findNavController().navigate(MainFragmentDirections.actionShowDetail(item))
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

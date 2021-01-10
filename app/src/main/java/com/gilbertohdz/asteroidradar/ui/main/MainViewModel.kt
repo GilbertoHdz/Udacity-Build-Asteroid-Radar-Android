@@ -10,6 +10,7 @@ import com.gilbertohdz.asteroidradar.api.getFirstAndEndDate
 import com.gilbertohdz.asteroidradar.api.parseAsteroidsJsonResult
 import com.gilbertohdz.asteroidradar.models.Asteroid
 import com.gilbertohdz.asteroidradar.models.PictureOfDay
+import com.gilbertohdz.asteroidradar.ui.LiveEvent
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.lang.Exception
@@ -26,6 +27,9 @@ class MainViewModel : ViewModel() {
 
     private val _imageOfTheDay: MutableLiveData<PictureOfDay> = MutableLiveData()
     val imageOfTheDay: LiveData<PictureOfDay> = _imageOfTheDay
+
+    private val _navigateToDetail: MutableLiveData<Asteroid> = MutableLiveData()
+    val navigateToDetail: LiveData<Asteroid> = _navigateToDetail.toSingleEvent()
 
     init {
         getAsteroids()
@@ -50,6 +54,7 @@ class MainViewModel : ViewModel() {
                 }
 
             } catch (e: Exception) {
+                Log.e("MainViewModel", e.message?: "error")
                 _apiStatus.value = AsteroidApiStatus.ERROR
             }
         }
@@ -66,5 +71,17 @@ class MainViewModel : ViewModel() {
                 Log.e("MainViewModel", e.message?: "error")
             }
         }
+    }
+
+    fun navigateToDetail(item: Asteroid) {
+        _navigateToDetail.value = item
+    }
+
+    fun <T> LiveData<T>.toSingleEvent(): LiveData<T> {
+        val result = LiveEvent<T>()
+        result.addSource(this) {
+            result.value = it
+        }
+        return result
     }
 }

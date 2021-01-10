@@ -5,6 +5,10 @@
 
     <data>
         <variable
+            name="viewModel"
+            type="com.gilbertohdz.asteroidradar.ui.main.MainViewModel" />
+
+        <variable
             name="asteroid"
             type="com.gilbertohdz.asteroidradar.models.Asteroid" />
     </data>
@@ -12,6 +16,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="@{() -> viewModel.navigateToDetail(asteroid)}"
         android:padding="16dp">
 
         <TextView

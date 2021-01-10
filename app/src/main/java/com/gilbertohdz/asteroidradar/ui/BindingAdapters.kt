@@ -34,7 +34,7 @@ fun bindProgress(progressBar: ProgressBar, status: AsteroidApiStatus?) {
 @BindingAdapter("statusMessage")
 fun bindProgress(constraintLayout: ConstraintLayout, status: AsteroidApiStatus) {
     if (status == AsteroidApiStatus.ERROR) {
-        Snackbar.make (constraintLayout, "an error has been occurred, try again.", Snackbar.LENGTH_SHORT)
+        Snackbar.make (constraintLayout.rootView, "an error has been occurred, try again.", Snackbar.LENGTH_SHORT)
     }
 }
 

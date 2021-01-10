@@ -43,6 +43,7 @@ class MainViewHolder(
 
     fun bindTo(viewModel: MainViewModel,
                asteroid: Asteroid) {
+        binding.viewModel = viewModel
         binding.asteroid = asteroid
     }
 }
