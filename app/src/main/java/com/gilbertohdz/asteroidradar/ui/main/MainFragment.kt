@@ -8,11 +8,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.gilbertohdz.asteroidradar.R
 import com.gilbertohdz.asteroidradar.databinding.FragmentMainBinding
+import com.gilbertohdz.asteroidradar.repository.FilterBy
 
 class MainFragment : Fragment() {
 
     private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
+        ViewModelProvider(this, MainViewModel.Factory(requireActivity().application))
+                .get(MainViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -44,6 +46,11 @@ class MainFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.show_week_menu -> viewModel.filterBy(FilterBy.WEEKLY)
+            R.id.show_today_menu -> viewModel.filterBy(FilterBy.TODAY)
+            R.id.show_local_menu -> viewModel.filterBy(FilterBy.LOCAL)
+        }
         return true
     }
 }

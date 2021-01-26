@@ -1,58 +1,57 @@
 package com.gilbertohdz.asteroidradar.ui.main
 
+import android.app.Application
+import android.content.Context
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
 import com.gilbertohdz.asteroidradar.api.AsteroidApi
-import com.gilbertohdz.asteroidradar.api.getFirstAndEndDate
-import com.gilbertohdz.asteroidradar.api.parseAsteroidsJsonResult
+import com.gilbertohdz.asteroidradar.local.AsteroidDAO
+import com.gilbertohdz.asteroidradar.local.AsteroidDB
 import com.gilbertohdz.asteroidradar.models.Asteroid
 import com.gilbertohdz.asteroidradar.models.PictureOfDay
+import com.gilbertohdz.asteroidradar.repository.AsteroidRepository
+import com.gilbertohdz.asteroidradar.repository.FilterBy
 import com.gilbertohdz.asteroidradar.ui.LiveEvent
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.lang.Exception
 
 enum class AsteroidApiStatus { LOADING, ERROR, SUCCESS }
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : ViewModel() {
+
+    private val asteroidRepository = AsteroidRepository(AsteroidDB.getInstance(application.applicationContext))
 
     private val _apiStatus: MutableLiveData<AsteroidApiStatus> = MutableLiveData()
     val apiStatus: LiveData<AsteroidApiStatus> = _apiStatus
 
-    private val _asteroids: MutableLiveData<List<Asteroid>> = MutableLiveData()
-    val asteroids: LiveData<List<Asteroid>> = _asteroids
-
-    private val _imageOfTheDay: MutableLiveData<PictureOfDay> = MutableLiveData()
-    val imageOfTheDay: LiveData<PictureOfDay> = _imageOfTheDay
-
     private val _navigateToDetail: MutableLiveData<Asteroid> = MutableLiveData()
     val navigateToDetail: LiveData<Asteroid> = _navigateToDetail.toSingleEvent()
 
+    val asteroids = asteroidRepository.asteroids
+    val imageOfTheDay = asteroidRepository.pictureOfDay
+
     init {
-        getAsteroids()
-        loadPictureOfTheDay()
+        refreshAsteroidsFromRepository()
+        refreshPictureFromRepository()
     }
 
-    private fun getAsteroids() {
+    fun filterBy(filter: FilterBy) {
+        asteroidRepository.applyFilter(filter)
+    }
+
+    fun navigateToDetail(item: Asteroid) {
+        _navigateToDetail.value = item
+    }
+
+    private fun refreshAsteroidsFromRepository() {
         viewModelScope.launch {
             _apiStatus.value = AsteroidApiStatus.LOADING
 
             try {
-                val result = AsteroidApi.retrofitService.getAsteroids(getFirstAndEndDate().first, getFirstAndEndDate().second)
-
-                if (result.isSuccessful) {
-                    val body = result.body()?.string()
-                    val jsonObject = JSONObject(body)
-
-                    _asteroids.value = parseAsteroidsJsonResult(jsonObject)
-                    _apiStatus.value = AsteroidApiStatus.SUCCESS
-                } else {
-                    _apiStatus.value = AsteroidApiStatus.ERROR
-                }
-
+                asteroidRepository.refreshAsteroids()
+                _apiStatus.value = AsteroidApiStatus.SUCCESS
             } catch (e: Exception) {
                 Log.e("MainViewModel", e.message?: "error")
                 _apiStatus.value = AsteroidApiStatus.ERROR
@@ -60,21 +59,14 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    private fun loadPictureOfTheDay() {
+    private fun refreshPictureFromRepository() {
         viewModelScope.launch {
             try {
-                val result = AsteroidApi.retrofitService.getPlanetaryApod()
-                if (result.isSuccessful) {
-                    _imageOfTheDay.value = result.body()
-                }
+                asteroidRepository.refreshPicture()
             } catch (e: Exception) {
                 Log.e("MainViewModel", e.message?: "error")
             }
         }
-    }
-
-    fun navigateToDetail(item: Asteroid) {
-        _navigateToDetail.value = item
     }
 
     fun <T> LiveData<T>.toSingleEvent(): LiveData<T> {
@@ -83,5 +75,35 @@ class MainViewModel : ViewModel() {
             result.value = it
         }
         return result
+    }
+
+    class Factory(val app: Application): ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+                return MainViewModel(app) as T
+            }
+
+            throw IllegalArgumentException("Unable to construct viewmodel")
+        }
+    }
+}
+
+class AsteroidWorkManager(
+    context: Context,
+    params: WorkerParameters
+): CoroutineWorker(context, params) {
+
+    override suspend fun doWork(): Result {
+        val db: AsteroidDB = AsteroidDB.getInstance(applicationContext)
+        val asteroidDao: AsteroidDAO = db.asteroidDao
+
+        try {
+            val result = AsteroidApi.retrofitService.getPlanetaryApod()
+            //asteroidDao.insert(result.)
+        } catch (e: Exception) {
+            return Result.retry()
+        }
+
+        return Result.success()
     }
 }
