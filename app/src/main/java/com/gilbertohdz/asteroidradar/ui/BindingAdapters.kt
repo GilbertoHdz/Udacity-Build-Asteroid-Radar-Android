@@ -34,7 +34,7 @@ fun bindProgress(progressBar: ProgressBar, status: AsteroidApiStatus?) {
 @BindingAdapter("statusMessage")
 fun bindProgress(constraintLayout: ConstraintLayout, status: AsteroidApiStatus) {
     if (status == AsteroidApiStatus.ERROR) {
-        Snackbar.make (constraintLayout.rootView, "an error has been occurred, try again.", Snackbar.LENGTH_SHORT)
+        Snackbar.make(constraintLayout.rootView, "an error has been occurred, try again.", Snackbar.LENGTH_SHORT).show()
     }
 }
 
@@ -47,19 +47,27 @@ fun bindImageOfTheDay(imageView: ImageView, pictureOfDay: PictureOfDay?) {
 
 @BindingAdapter("statusIcon")
 fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {
+    val context = imageView.context
+
     if (isHazardous) {
         imageView.setImageResource(R.drawable.ic_status_potentially_hazardous)
+        imageView.contentDescription = context.getString(R.string.potentially_hazardous_asteroid_image)
     } else {
         imageView.setImageResource(R.drawable.ic_status_normal)
+        imageView.contentDescription = context.getString(R.string.not_hazardous_asteroid_image)
     }
 }
 
 @BindingAdapter("asteroidStatusImage")
 fun bindDetailsStatusImage(imageView: ImageView, isHazardous: Boolean) {
+    val context = imageView.context
+
     if (isHazardous) {
         imageView.setImageResource(R.drawable.asteroid_hazardous)
+        imageView.contentDescription = context.getString(R.string.potentially_hazardous_asteroid_image)
     } else {
         imageView.setImageResource(R.drawable.asteroid_safe)
+        imageView.contentDescription = context.getString(R.string.not_hazardous_asteroid_image)
     }
 }
 
