@@ -87,23 +87,3 @@ class MainViewModel(application: Application) : ViewModel() {
         }
     }
 }
-
-class AsteroidWorkManager(
-    context: Context,
-    params: WorkerParameters
-): CoroutineWorker(context, params) {
-
-    override suspend fun doWork(): Result {
-        val db: AsteroidDB = AsteroidDB.getInstance(applicationContext)
-        val asteroidDao: AsteroidDAO = db.asteroidDao
-
-        try {
-            val result = AsteroidApi.retrofitService.getPlanetaryApod()
-            //asteroidDao.insert(result.)
-        } catch (e: Exception) {
-            return Result.retry()
-        }
-
-        return Result.success()
-    }
-}
